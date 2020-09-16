@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2020-09-15 15:28:42
 LastEditors: xiaoshuyui
-LastEditTime: 2020-09-15 15:42:28
+LastEditTime: 2020-09-16 16:33:57
 '''
 from ruia import TextField, Item, Spider
 
@@ -27,10 +27,12 @@ if __name__ == "__main__":
 
     from ruia import Request
 
-    request = Request("https://pypi.org/project/arsenic/")
+    request = Request("https://pypi.org/simple/cv2/")
     response = asyncio.get_event_loop().run_until_complete(request.fetch())
 
-    print(response.html)
+    print(response.status)
+    if response.status == 200:
+        print(response.html)
     # HackerNewSpider.start()
 
     # print(HackerNewSpider.)

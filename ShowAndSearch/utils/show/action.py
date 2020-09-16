@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2020-09-15 14:09:29
 LastEditors: xiaoshuyui
-LastEditTime: 2020-09-15 17:24:40
+LastEditTime: 2020-09-16 16:29:39
 
 
 show
@@ -21,6 +21,7 @@ Options:
 import importlib
 from ShowAndSearch.utils.logger import logger
 from ShowAndSearch.utils.parser import BaseParser
+import difflib
 
 def script():
     argList = [
@@ -61,9 +62,13 @@ def script():
                     help(moduleName+'.'+methodName)
                 else:
                     logger.error('module {} not contain {}'.format(moduleName,methodName))
+                    lis = difflib.get_close_matches(methodName,methodList)
+                    if len(lis)>0:
+                        logger.info('do you mean: {} ?'.format(' OR '.join(lis)))
+                    del lis
                     return
             else:
-                return
+                help(moduleName)
 
         
 

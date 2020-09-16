@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2020-09-15 14:10:02
 LastEditors: xiaoshuyui
-LastEditTime: 2020-09-15 14:59:36
+LastEditTime: 2020-09-16 16:40:13
 '''
 import os
 import subprocess
@@ -21,21 +21,21 @@ def cmd(command):
         print("失败")
 
 if __name__ == "__main__":
-    # cmd("java -version")
+    os.system("pip install {} -i https://pypi.tuna.tsinghua.edu.cn/simple/".format('opencv-python'))
     # cmd("exit 1")
     # cmd("python")
-    tmp = 'cv2'.split('.')
+    # tmp = 'cv2'.split('.')
     # module = importlib.__import__(tmp[0])
     # methodList = dir(module)
 
-    x = 'cv2.imshow'
+    # x = 'cv2.imshow'
 
-    x = 'cv2'
+    # x = 'cv2'
 
     # if 'imshow' in methodList:
     #     print(True)
     
-    help(x)
+    # help(x)
 
     # help(module.imshow)
 
