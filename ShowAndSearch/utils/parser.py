@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2020-09-15 15:59:10
 LastEditors: xiaoshuyui
-LastEditTime: 2020-09-15 17:10:24
+LastEditTime: 2020-09-17 08:45:54
 '''
 import argparse
 from ShowAndSearch.utils.logger import logger
@@ -24,7 +24,7 @@ class BaseParser(object):
     def get_parser(self):
         
         self.parser.add_argument('question',metavar='QUESTION',type=str,nargs='*',help='the question to answer')
-        self.parser.add_argument('-v','--version',help='show current version')
+        self.parser.add_argument('-v','--version',help='show current version',action='store_true')
         if len(self.args)>0:
             # self.parser.add_argument('-f','--force',help='force to show message even do not contain the module')
             # self.parser.add_argument('-s','--simple',help='show simple message')
