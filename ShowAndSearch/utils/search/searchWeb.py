@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2020-09-17 11:11:36
 LastEditors: xiaoshuyui
-LastEditTime: 2020-09-17 14:29:53
+LastEditTime: 2020-09-22 11:19:46
 
 
 USELESS
@@ -25,7 +25,7 @@ import re
 from requests.exceptions import SSLError
 import json
 
-URL =  'stackoverflow.com'
+URL = 'stackoverflow.com'
 
 NO_ANSWER_MSG = '< no answer given >'
 
@@ -56,6 +56,7 @@ BLOCK_INDICATORS = (
 ANSWER_HEADER = '{2}  Answer from {0} {2}\n{1}'
 STAR_HEADER = '\u2605'
 
+
 def random_int(width):
     bres = os.urandom(width)
     ires = int.from_bytes(bres, 'little')
@@ -64,15 +65,14 @@ def random_int(width):
 
 def _extract_links(html, search_engine='bing'):
     html.remove_namespaces()
-    with open('D:\\testALg\\ShowAndSearch\\show-and-search\\testscripts\\1.html','w',encoding='utf-8') as f:
+    with open('D:\\testALg\\ShowAndSearch\\show-and-search\\testscripts\\1.html', 'w', encoding='utf-8') as f:
         f.write(str(html))
     return [a.attrib['href'] for a in html('.b_algo')('h2')('a')]
 
 
-
-
 def random_choice(seq):
     return seq[random_int(1) % len(seq)]
+
 
 def get_link_at_pos(links, position):
     if not links:
@@ -83,6 +83,7 @@ def get_link_at_pos(links, position):
     else:
         link = links[-1]
     return link
+
 
 def get_proxies():
     proxies = getproxies()
@@ -95,14 +96,17 @@ def get_proxies():
                 filtered_proxies[key] = value
     return filtered_proxies
 
+
 def _get_result(url):
     try:
         return searchSession.get(url, headers={'User-Agent': random_choice(USER_AGENTS)},
-                                  proxies=get_proxies(),
-                                  verify=True).text
+                                 proxies=get_proxies(),
+                                 verify=True).text
     except requests.exceptions.SSLError as error:
-        logger.error('Encountered an SSL Error. Try using HTTP instead of HTTPS ".\n')
+        logger.error(
+            'Encountered an SSL Error. Try using HTTP instead of HTTPS ".\n')
         raise error
+
 
 def _add_links_to_text(element):
     hyperlinks = element.find('a')
@@ -117,6 +121,7 @@ def _add_links_to_text(element):
             replacement = "[{0}]({1})".format(copy, href)
         pquery_object.replace_with(replacement)
 
+
 def get_text(element):
     ''' return inner text in pyquery element '''
     _add_links_to_text(element)
@@ -124,6 +129,7 @@ def get_text(element):
         return element.text(squash_space=False)
     except TypeError:
         return element.text()
+
 
 def _format_output(code, args):
     if not args['color']:
@@ -149,6 +155,7 @@ def _format_output(code, args):
     return highlight(code,
                      lexer,
                      TerminalFormatter(bg='dark'))
+
 
 def _get_answer(args, links):
     link = get_link_at_pos(links, args['pos'])
@@ -194,8 +201,10 @@ def _get_answer(args, links):
     text = text.strip()
     return text
 
+
 def _get_search_url(search_engine='bing'):
     return web.get(search_engine, web['bing'])
+
 
 def _is_blocked(page):
     for indicator in BLOCK_INDICATORS:
@@ -204,10 +213,12 @@ def _is_blocked(page):
 
     return False
 
+
 def _get_links(query):
     search_engine = 'bing'
     search_url = _get_search_url(search_engine)
-    question_url = (search_url.format(URL, url_quote(query))).replace('site:','')
+    question_url = (search_url.format(
+        URL, url_quote(query))).replace('site:', '')
     # print(question_url)
     question_url = 'https://cn.bing.com/search?q=stackoverflow.com\%20\%20print\%20\stack%20trace%20python&toHttps=1&redig=4C72A2C577E941C7A802A1B46268FAAD'
     result = _get_result(question_url)
@@ -216,11 +227,12 @@ def _get_links(query):
 
     if _is_blocked(result):
         logger.error('Unable to find an answer because the search engine temporarily blocked the request. '
-                   'Please wait a few minutes or select a different search engine.')
+                     'Please wait a few minutes or select a different search engine.')
         raise RuntimeError("Temporary block by search engine")
 
     html = pq(result)
     return _extract_links(html, search_engine)
+
 
 def _get_questions(links):
     return [link for link in links if _is_question(link)]
@@ -298,7 +310,6 @@ def _format_answers(res, args):
     return build_splitter().join(formatted_answers)
 
 
-
 def _parse_cmd(args, res):
     answer = _format_answers(res, args)
     # cmd_key = _get_stash_key(args)
@@ -312,7 +323,8 @@ def _parse_cmd(args, res):
     #     return ''
     return answer
 
-def script(question:str):
+
+def script(question: str):
     args = dict()
     args['query'] = question
     try:
@@ -323,5 +335,5 @@ def script(question:str):
     except (ConnectionError, SSLError):
         res = {'error': 'Unable to reach {search_engine}. Do you need to use a proxy?\n'.format(
             search_engine=args['search_engine'])}
-    
+
     return _parse_cmd(args, res)

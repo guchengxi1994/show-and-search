@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2020-09-15 14:09:29
 LastEditors: xiaoshuyui
-LastEditTime: 2020-09-16 16:29:39
+LastEditTime: 2020-09-22 13:12:13
 
 
 show
@@ -22,14 +22,16 @@ import importlib
 from ShowAndSearch.utils.logger import logger
 from ShowAndSearch.utils.parser import BaseParser
 import difflib
+import smoothnlp
+
 
 def script():
     argList = [
-        ('-f','--force','force to show message even do not contain the module'),
-        ('-s','--simple','show simple message')
+        ('-f', '--force', 'force to show message even do not contain the module'),
+        ('-s', '--simple', 'show simple message')
     ]
 
-    p = BaseParser(argList,'show')
+    p = BaseParser(argList, 'show')
     parser = p.get_parser()
     args = vars(parser.parse_args())
 
@@ -38,7 +40,7 @@ def script():
         print(__version__)
         del __version__
         return
-    
+
     if not args['question']:
         parser.print_help()
         return
@@ -50,31 +52,44 @@ def script():
             try:
                 module = importlib.__import__(moduleName)
             except:
-                logger.error('module not found \n try search {}'.format(moduleName))
+                logger.error(
+                    'module not found \n try search {}'.format(moduleName))
                 return
 
             # try:
             tmp.remove(tmp[0])
-            methodList = dir(module) 
-            if len(tmp)>0:
+            methodList = dir(module)
+            if len(tmp) > 0:
                 methodName = '.'.join(tmp)
                 if methodName in methodList:
-                    help(moduleName+'.'+methodName)
+                    if not args['simple']:
+                        logger.info('press "q" to quit!')
+                        help(moduleName+'.'+methodName)
+                        return
+                    else:
+                        impo = getattr(module,methodName)
+                        words = impo.__doc__
+                        # print(words)
+                        tmp = smoothnlp.split2sentences(str(words))
+                        print(tmp[0])
+                        return
                 else:
-                    logger.error('module {} not contain {}'.format(moduleName,methodName))
-                    lis = difflib.get_close_matches(methodName,methodList)
-                    if len(lis)>0:
-                        logger.info('do you mean: {} ?'.format(' OR '.join(lis)))
+                    logger.error('module {} not contain {}'.format(
+                        moduleName, methodName))
+                    lis = difflib.get_close_matches(methodName, methodList)
+                    if len(lis) > 0:
+                        logger.info(
+                            'do you mean: {} ?'.format(' OR '.join(lis)))
                     del lis
                     return
             else:
-                help(moduleName)
+                if not args['simple']:
+                    logger.info('press "q" to quit!')
+                    help(moduleName)
+                else:
+                    words = module.__doc__
+                    tmp = smoothnlp.split2sentences(str(words))
+                    print(tmp[0])
 
-        
-
-
-
-
-
-
-
+                    del words, tmp
+                    return
